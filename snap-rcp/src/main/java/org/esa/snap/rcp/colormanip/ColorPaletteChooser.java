@@ -34,7 +34,7 @@ import java.util.Vector;
 
 class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrapper> {
 
-    private final String DERIVED_FROM = "derived from";
+    private final String DERIVED_FROM = "source: ";
     private final String UNNAMED = "unnamed";
     private boolean discreteDisplay;
     private boolean log10Display;
@@ -84,7 +84,11 @@ class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrap
         final String suffix = userPalette.getFirstPoint().getLabel();
         final String name;
         if (suffix != null && suffix.trim().length() > 0) {
-            name = DERIVED_FROM + " " + suffix.trim();
+            if (suffix.toLowerCase().endsWith(".cpd")) {
+                name = DERIVED_FROM + " " + suffix.trim().substring(0, suffix.length() - 4);
+            } else {
+                name = DERIVED_FROM + " " + suffix.trim();
+            }
         } else {
             name = UNNAMED;
         }
@@ -161,7 +165,7 @@ class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrap
         g2.setStroke(new BasicStroke(1.0f));
 
         for (int x = 0; x < width; x++) {
-            if (isSelected) {
+            if (isSelected && index != 0) {
                 int edgeThickness = 1;
                 g2.setColor(colorPalette[x]);
                 g2.drawLine(x, (edgeThickness + 1), x, height - (edgeThickness + 1));
