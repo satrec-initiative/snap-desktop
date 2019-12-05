@@ -79,7 +79,7 @@ import java.util.concurrent.Executors;
 //          - Added capability to export color palette in cpt and pal formats.
 
 @NbBundle.Messages({
-        "CTL_ColorManipulationForm_TitlePrefix=Colour Manipulation"
+        "CTL_ColorManipulationForm_TitlePrefix=Colors"
 })
 class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductSceneView>, ColorManipulationForm {
 
@@ -355,30 +355,36 @@ class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductScene
         gbc.gridwidth = 1;
         gbc.gridy++;
         toolButtonsPanel.add(resetButton, gbc);
+        gbc.gridy++;
+
         toolButtonsPanel.add(multiApplyButton, gbc);
         gbc.gridy++;
         toolButtonsPanel.add(importButton, gbc);
+        gbc.gridy++;
+
         toolButtonsPanel.add(exportButton, gbc);
         gbc.gridy++;
         AbstractButton[] additionalButtons = getChildForm().getToolButtons();
         for (int i = 0; i < additionalButtons.length; i++) {
             AbstractButton button = additionalButtons[i];
             toolButtonsPanel.add(button, gbc);
-            if (i % 2 == 1) {
+
+            // Changed to only 1 column
+//            if (i % 2 == 1) {
                 gbc.gridy++;
-            }
+//            }
         }
 
         gbc.gridy++;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 1;
         toolButtonsPanel.add(new JLabel(" "), gbc); // filler
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0.0;
         gbc.gridwidth = 1;
         gbc.gridy++;
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         toolButtonsPanel.add(helpButton, gbc);
     }
 

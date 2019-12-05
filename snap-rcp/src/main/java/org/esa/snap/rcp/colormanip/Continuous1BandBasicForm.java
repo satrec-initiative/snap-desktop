@@ -27,6 +27,7 @@ import org.esa.snap.core.util.PropertyMap;
 import org.esa.snap.core.util.math.Range;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
@@ -113,6 +114,7 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         loadWithCPDFileValuesCheckBox.setToolTipText("When loading a new cpd file, use it's actual value and overwrite user min/max values");
 
         paletteInversionButton = new JButton("Reverse");
+        paletteInversionButton.setMargin(new Insets(2,4,2,4));
         paletteInversionButton.setToolTipText("Reverse (invert) palette"); /*I18N*/
         paletteInversionButton.addActionListener(new ActionListener() {
             @Override
@@ -127,32 +129,11 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         minField = getNumberTextField(0.00001);
         maxField = getNumberTextField(1);
 
-        fromFile = new JButton("Cpd Range");
-        fromData = new JButton("Data Range");
+        fromFile = new JButton("Source File Values");
+        fromData = new JButton("Image Data Values");
+        fromFile.setMargin(new Insets(2,4,2,4));
+        fromData.setMargin(new Insets(2,4,2,4));
 
-
-
-        final TableLayout layout = new TableLayout();
-        layout.setTableWeightX(1.0);
-        layout.setTableWeightY(1.0);
-        layout.setTablePadding(2, 2);
-        layout.setTableFill(TableLayout.Fill.HORIZONTAL);
-        layout.setTableAnchor(TableLayout.Anchor.NORTH);
-        layout.setCellPadding(0, 0, new Insets(8, 2, 2, 2));
-        layout.setCellPadding(1, 0, new Insets(8, 2, 2, 2));
-        layout.setCellPadding(2, 0, new Insets(8, 2, 2, 2));
-        layout.setCellPadding(3, 0, new Insets(13, 2, 5, 2));
-
-        final JPanel editorPanel = new JPanel(layout);
-
-        JPanel schemePanel = getSchemePanel("Scheme");
-        editorPanel.add(schemePanel);
-
-        JPanel palettePanel = getPalettePanel("Palette");
-        editorPanel.add(palettePanel);
-
-        JPanel rangePanel = getRangePanel("Range");
-        editorPanel.add(rangePanel);
 
         shouldFireChooserEvent = false;
 
@@ -193,11 +174,11 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
 
         fromFile.addActionListener(createListener(RangeKey.FromCpdFile));
         fromData.addActionListener(createListener(RangeKey.FromData));
-        fromData.setToolTipText("Set range from data");
-        fromFile.setToolTipText("Set range from cpd file");
+        fromData.setToolTipText("Set range from data values");
+        fromFile.setToolTipText("Set range from source cpd file values");
 
         contentPanel = new JPanel(new BorderLayout());
-        contentPanel.add(editorPanel, BorderLayout.NORTH);
+        contentPanel.add(getMainEditorPanel(), BorderLayout.NORTH);
         moreOptionsForm = new MoreOptionsForm(this, parentForm.getFormModel().canUseHistogramMatching());
         discreteCheckBox = new DiscreteCheckBox(parentForm);
         moreOptionsForm.addRow(discreteCheckBox);
@@ -231,6 +212,10 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
 
         shouldFireChooserEvent = true;
     }
+
+
+
+
 
     private void handleMaxTextfield() {
 
@@ -487,6 +472,37 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         }
     }
 
+
+
+    private JPanel getMainEditorPanel() {
+        final TableLayout layout = new TableLayout();
+        layout.setTableWeightX(1.0);
+        layout.setTableWeightY(1.0);
+        layout.setTablePadding(2, 2);
+        layout.setTableFill(TableLayout.Fill.HORIZONTAL);
+        layout.setTableAnchor(TableLayout.Anchor.NORTH);
+        layout.setCellPadding(0, 0, new Insets(8, 2, 2, 2));
+        layout.setCellPadding(1, 0, new Insets(8, 2, 2, 2));
+        layout.setCellPadding(2, 0, new Insets(8, 2, 2, 2));
+        layout.setCellPadding(3, 0, new Insets(13, 2, 5, 2));
+
+        final JPanel editorPanel = new JPanel(layout);
+
+
+        JPanel palettePanel = getPalettePanel("Palette");
+        editorPanel.add(palettePanel);
+
+        JPanel rangePanel = getRangePanel("Range");
+        editorPanel.add(rangePanel);
+
+
+        JPanel schemePanel = getSchemePanel("Scheme");
+        editorPanel.add(schemePanel);
+
+        return editorPanel;
+    }
+
+
     private JPanel getSchemePanel(String title) {
         JPanel jPanel = new JPanel(new GridBagLayout());
         jPanel.setBorder(BorderFactory.createTitledBorder(title));
@@ -529,6 +545,7 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         gbc.gridy++;
         jPanel.add(loadWithCPDFileValuesCheckBox, gbc);
 
+        gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
         jPanel.add(paletteInversionButton, gbc);
 
@@ -537,81 +554,38 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
 
 
 
-    private JPanel getOldPalettePanel(String title) {
+
+
+
+    private JPanel getMinMaxPanel() {
         JPanel jPanel = new JPanel(new GridBagLayout());
-        jPanel.setBorder(BorderFactory.createTitledBorder(title));
-        jPanel.setToolTipText("");
         GridBagConstraints gbc = new GridBagConstraints();
 
-
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(0, 4, 4, 4);
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.anchor = GridBagConstraints.WEST;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        jPanel.add(colorPaletteChooser, gbc);
-
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        final JPanel row2Panel = new JPanel(new BorderLayout(0, 0));
-        row2Panel.add(loadWithCPDFileValuesCheckBox, BorderLayout.WEST);
-        row2Panel.add(paletteInversionButton, BorderLayout.EAST);
-
-        jPanel.add(row2Panel, gbc);
-
-
-        return jPanel;
-    }
-
-
-
-
-    private JPanel getOldRangePanel(String title) {
-
-        JPanel jPanel = new JPanel(new GridBagLayout());
-        jPanel.setBorder(BorderFactory.createTitledBorder(title));
-        jPanel.setToolTipText("");
-        GridBagConstraints gbc = new GridBagConstraints();
-
-
-
-        final JPanel minPanel = new JPanel(new BorderLayout(0, 0));
-        minPanel.add(new JLabel("Min:"), BorderLayout.WEST);
-        minPanel.add(minField, BorderLayout.EAST);
-
-        final JPanel maxPanel = new JPanel(new BorderLayout(0, 0));
-        maxPanel.add(new JLabel("Max:"), BorderLayout.WEST);
-        maxPanel.add(maxField, BorderLayout.EAST);
-
-        final JPanel minMaxPanel = new JPanel(new BorderLayout(0, 0));
-        minMaxPanel.add(minPanel, BorderLayout.WEST);
-        minMaxPanel.add(maxPanel, BorderLayout.EAST);
-
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        jPanel.add(new JLabel("Min:"), gbc);
 
         gbc.weightx = 1.0;
-        gbc.insets = new Insets(0, 5, 5, 5);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        jPanel.add(minField, gbc);
 
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridy = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        jPanel.add(new JLabel("Max:"), gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        jPanel.add(minMaxPanel, gbc);
-
-
-        final JPanel buttonPanel = new JPanel(new BorderLayout(5, 10));
-        buttonPanel.add(fromFile, BorderLayout.WEST);
-        buttonPanel.add(fromData, BorderLayout.EAST);
-
-
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 4, 4, 4);
-
-
-        jPanel.add(buttonPanel, gbc);
+        jPanel.add(maxField, gbc);
 
         return jPanel;
     }
@@ -624,14 +598,6 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         jPanel.setToolTipText("");
         GridBagConstraints gbc = new GridBagConstraints();
 
-        final JPanel minPanel = new JPanel(new BorderLayout(0, 0));
-        minPanel.add(new JLabel("Min:"), BorderLayout.WEST);
-        minPanel.add(minField, BorderLayout.EAST);
-
-        final JPanel maxPanel = new JPanel(new BorderLayout(0, 0));
-        maxPanel.add(new JLabel("Max:"), BorderLayout.WEST);
-        maxPanel.add(maxField, BorderLayout.EAST);
-
         gbc.weightx = 1.0;
         gbc.insets = new Insets(0, 5, 5, 5);
 
@@ -640,11 +606,9 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        jPanel.add(minPanel, gbc);
+        jPanel.add(getMinMaxPanel(), gbc);
 
-        gbc.gridy++;
-        jPanel.add(maxPanel, gbc);
-
+        gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
         jPanel.add(fromFile, gbc);
 

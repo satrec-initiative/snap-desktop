@@ -69,7 +69,7 @@ public class Continuous1BandSwitcherForm implements ColorManipulationChildForm {
         tabularButton.addActionListener(switcherActionListener);
 
         final JPanel editorSwitcherPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
-        editorSwitcherPanel.add(new JLabel("Editor:"));
+//        editorSwitcherPanel.add(new JLabel("Editor:"));
         editorSwitcherPanel.add(basicButton);
         editorSwitcherPanel.add(graphicalButton);
         editorSwitcherPanel.add(tabularButton);
