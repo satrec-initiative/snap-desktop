@@ -57,7 +57,7 @@ import java.text.DecimalFormat;
 //          - Added color scheme logic
 //          - Added capability to reverse the color palette
 //          - Added capabiltiy to load exact values of the cpd file within any mathematical interpolation applied.
-
+// DEC 2019 - Knowles
 
 
 public class Continuous1BandBasicForm implements ColorManipulationChildForm {

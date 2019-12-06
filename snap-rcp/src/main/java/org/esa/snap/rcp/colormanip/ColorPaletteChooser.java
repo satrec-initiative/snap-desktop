@@ -30,6 +30,7 @@ import java.util.Vector;
 //          - Fixed bug where log scaled color palette would appear crunched in the selector
 //          - Added tooltips to show which color palette is being hovered over and selected
 //          - Added blue highlights within the renderer to show which color palette is being hovered over selected
+// DEC 2019 - Knowles
 
 
 class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrapper> {

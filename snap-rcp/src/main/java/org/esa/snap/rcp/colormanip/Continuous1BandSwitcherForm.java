@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
  */
 // OCT 2019 - Knowles
 //          - Set basic mode to be the default
+// DEC 2019 - Knowles
 
 
 public class Continuous1BandSwitcherForm implements ColorManipulationChildForm {

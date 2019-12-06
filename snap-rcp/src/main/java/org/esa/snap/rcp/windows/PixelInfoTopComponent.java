@@ -35,12 +35,15 @@ import java.beans.PropertyChangeListener;
 /**
  * Experimental top component which displays information about selected pixel.
  */
+
+// DEC 2019 Knowles
+
 @TopComponent.Description(
         preferredID = "PixelInfoTopComponent",
         iconBase = "org/esa/snap/rcp/icons/PixelInfo.png",
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer",
+@TopComponent.Registration(mode = "rightSlidingSide",
                            openAtStartup = true,
                            position = 20
 )
@@ -68,7 +71,7 @@ public final class PixelInfoTopComponent extends ToolTopComponent {
         setName(Bundle.CTL_PixelInfoTopComponentName());
         setToolTipText(Bundle.CTL_PixelInfoTopComponentDescription());
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
+//        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
         pixelPositionListener = new MyPixelPositionListener();
         pinSelectionChangeListener = new PinSelectionChangeListener();
         pinChangedListener = new PinChangedListener();

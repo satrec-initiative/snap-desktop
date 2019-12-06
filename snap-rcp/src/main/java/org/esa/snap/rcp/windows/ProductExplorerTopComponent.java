@@ -47,6 +47,8 @@ import java.util.logging.Level;
  *
  * @author Norman
  */
+// DEC 2019 Knowles
+
 @TopComponent.Description(
         preferredID = "ProductExplorerTopComponent",
         iconBase = "org/esa/snap/rcp/icons/RsProduct16.gif",
@@ -63,7 +65,7 @@ import java.util.logging.Level;
         preferredID = "ProductExplorerTopComponent"
 )
 @NbBundle.Messages({
-        "CTL_ProductExplorerTopComponentName=Product Explorer",
+        "CTL_ProductExplorerTopComponentName=File Manager",
         "CTL_ProductExplorerTopComponentDescription=Lists all open products",
 })
 public class ProductExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
@@ -73,7 +75,7 @@ public class ProductExplorerTopComponent extends TopComponent implements Explore
 
     public ProductExplorerTopComponent() {
         initComponents();
-        setName("Product_Explorer");
+        setName("File Manager");
         setDisplayName(Bundle.CTL_ProductExplorerTopComponentName());
         setToolTipText(Bundle.CTL_ProductExplorerTopComponentDescription());
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);

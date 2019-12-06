@@ -25,13 +25,15 @@ import org.openide.windows.TopComponent;
 
 import javax.swing.event.ListSelectionListener;
 
+// DEC 2019 Knowles
+
 @TopComponent.Description(
         preferredID = "MaskManagerTopComponent",
         iconBase = "org/esa/snap/rcp/icons/MaskManager.png",
         persistenceType = TopComponent.PERSISTENCE_ALWAYS //todo define
 )
 @TopComponent.Registration(
-        mode = "rightSlidingSide",
+        mode = "properties",
         openAtStartup = true,
         position = 20
 )

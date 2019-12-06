@@ -77,9 +77,10 @@ import java.util.concurrent.Executors;
 //          - Added color scheme logic which enables setting of the parameters based on the band name or desired color scheme.
 // DEC 2019 - Knowles / Yang
 //          - Added capability to export color palette in cpt and pal formats.
+// DEC 2019 Knowles
 
 @NbBundle.Messages({
-        "CTL_ColorManipulationForm_TitlePrefix=Colors"
+        "CTL_ColorManipulationForm_TitlePrefix=Color Manager"
 })
 class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductSceneView>, ColorManipulationForm {
 

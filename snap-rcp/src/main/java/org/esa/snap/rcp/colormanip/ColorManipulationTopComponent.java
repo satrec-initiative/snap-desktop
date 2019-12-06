@@ -24,15 +24,17 @@ import org.openide.windows.TopComponent;
 
 import java.awt.BorderLayout;
 
+// DEC 2019 Knowles
+
 @TopComponent.Description(
         preferredID = "ColorManipulationTopComponent",
         iconBase = "org/esa/snap/rcp/icons/ContrastStretch.gif",
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(
-        mode = "navigator",
+        mode = "properties",
         openAtStartup = true,
-        position = 20
+        position = 10
 )
 @ActionID(category = "Window", id = "org.esa.snap.rcp.colormanip.ColorManipulationTopComponent")
 @ActionReferences({
@@ -44,8 +46,8 @@ import java.awt.BorderLayout;
         preferredID = "ColorManipulationTopComponent"
 )
 @NbBundle.Messages({
-        "CTL_ColorManipulationTopComponent_Name=Colour Manipulation",
-        "CTL_ColorManipulationTopComponent_ComponentName=Colour_Manipulation"
+        "CTL_ColorManipulationTopComponent_Name=Color Manager",
+        "CTL_ColorManipulationTopComponent_ComponentName=Colors"
 })
 /**
  * The color manipulation tool window.

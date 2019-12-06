@@ -29,6 +29,8 @@ import org.openide.windows.TopComponent;
 import java.awt.BorderLayout;
 import java.util.WeakHashMap;
 
+// DEC 2019 Knowles
+
 @TopComponent.Description(
         preferredID = "LayerManagerTopComponent",
         iconBase = "org/esa/snap/rcp/icons/LayerManager.png",
@@ -37,7 +39,7 @@ import java.util.WeakHashMap;
 @TopComponent.Registration(
         mode = "rightSlidingSide",
         openAtStartup = true,
-        position = 10
+        position = 30
 )
 @ActionID(category = "Window", id = "org.esa.snap.rcp.layermanager.LayerManagerTopComponent")
 @ActionReferences({
