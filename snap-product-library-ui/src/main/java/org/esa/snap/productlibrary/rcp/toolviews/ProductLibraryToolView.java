@@ -64,7 +64,7 @@ import java.io.PrintStream;
 )
 @TopComponent.Registration(
         mode = "rightSlidingSide",
-        openAtStartup = true,
+        openAtStartup = false,
         position = 0
 )
 @ActionID(category = "Window", id = "org.esa.snap.productlibrary.rcp.toolviews.ProductLibraryToolView")

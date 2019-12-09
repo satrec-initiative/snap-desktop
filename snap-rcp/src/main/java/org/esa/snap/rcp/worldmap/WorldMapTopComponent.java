@@ -45,7 +45,7 @@ import static org.esa.snap.rcp.SnapApp.SelectionSourceHint.*;
 )
 @TopComponent.Registration(
         mode = "navigator",
-        openAtStartup = false,
+        openAtStartup = true,
         position = 40
 )
 @ActionID(category = "Window", id = "org.esa.snap.rcp.worldmap.WorldMapTopComponent")

@@ -43,7 +43,7 @@ import java.beans.PropertyChangeListener;
         iconBase = "org/esa/snap/rcp/icons/PixelInfo.png",
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "rightSlidingSide",
+@TopComponent.Registration(mode = "explorer",
                            openAtStartup = true,
                            position = 20
 )

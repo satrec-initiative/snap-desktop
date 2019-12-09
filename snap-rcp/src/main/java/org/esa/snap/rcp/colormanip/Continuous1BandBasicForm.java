@@ -129,8 +129,8 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
         minField = getNumberTextField(0.00001);
         maxField = getNumberTextField(1);
 
-        fromFile = new JButton("Source File Values");
-        fromData = new JButton("Image Data Values");
+        fromFile = new JButton("CPD Values");
+        fromData = new JButton("Data Values");
         fromFile.setMargin(new Insets(2,4,2,4));
         fromData.setMargin(new Insets(2,4,2,4));
 

@@ -47,7 +47,7 @@ import java.awt.Component;
 
 public class Continuous1BandTabularForm implements ColorManipulationChildForm {
 
-    private static final String[] COLUMN_NAMES = new String[]{"Colour", "Value"};
+    private static final String[] COLUMN_NAMES = new String[]{"Color", "Value"};
     private static final Class<?>[] COLUMN_TYPES = new Class<?>[]{Color.class, String.class};
 
     private final ColorManipulationForm parentForm;

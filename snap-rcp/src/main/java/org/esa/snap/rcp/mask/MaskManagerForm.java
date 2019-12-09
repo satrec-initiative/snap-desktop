@@ -62,6 +62,7 @@ class MaskManagerForm extends MaskForm {
         }
     }
 
+
     @Override
     public JPanel createContentPanel() {
         JPanel buttonPanel = GridBagUtils.createPanel();
@@ -74,19 +75,17 @@ class MaskManagerForm extends MaskForm {
         gbc.insets.bottom = 0;
         gbc.gridwidth = 1;
         final MaskAction[] allActions = actions.getAllActions();
-        for (int i = 0; i < allActions.length; i += 2) {
+        for (int i = 0; i < allActions.length; i += 1) {
             buttonPanel.add(allActions[i].createComponent(), gbc);
-            buttonPanel.add(allActions[i + 1].createComponent(), gbc);
             gbc.gridy++;
         }
 
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
         buttonPanel.add(new JLabel(" "), gbc); // filler
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0.0;
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 1;
         buttonPanel.add(helpButton, gbc);

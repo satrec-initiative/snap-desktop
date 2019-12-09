@@ -96,15 +96,21 @@ class MaskFormActions {
 
     MaskFormActions(ToolTopComponent maskTopComponent, MaskForm maskForm) {
         maskActions = new MaskAction[]{
-                new NewBandMathsAction(maskForm), new NewRangeAction(maskForm),
-                new NewVectorDataNodeAction(maskForm), new NullAction(maskForm),
-                new NewUnionAction(maskForm), new NewIntersectionAction(maskForm),
-                new NewDifferenceAction(maskForm), new NewInvDifferenceAction(maskForm),
-                new NewComplementAction(maskForm), new NullAction(maskForm),
-                new CopyAction(maskForm), new EditAction(maskForm),
-                new RemoveAction(maskForm), new TransferAction(maskForm),
-                new ImportAction(maskTopComponent, maskForm), new ExportAction(maskTopComponent, maskForm),
-                new ZoomToVectorMaskAction(maskTopComponent, maskForm), new NullAction(maskForm),
+                new NewBandMathsAction(maskForm),
+                new NewRangeAction(maskForm),
+                new NewVectorDataNodeAction(maskForm),
+                new NewUnionAction(maskForm),
+                new NewIntersectionAction(maskForm),
+                new NewDifferenceAction(maskForm),
+                new NewInvDifferenceAction(maskForm),
+                new NewComplementAction(maskForm),
+                new CopyAction(maskForm),
+                new EditAction(maskForm),
+                new RemoveAction(maskForm),
+                new TransferAction(maskForm),
+                new ImportAction(maskTopComponent, maskForm),
+                new ExportAction(maskTopComponent, maskForm),
+                new ZoomToVectorMaskAction(maskTopComponent, maskForm)
         };
     }
 

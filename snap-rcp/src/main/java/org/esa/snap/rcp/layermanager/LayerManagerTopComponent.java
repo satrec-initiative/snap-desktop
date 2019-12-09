@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS //todo define
 )
 @TopComponent.Registration(
-        mode = "rightSlidingSide",
+        mode = "properties",
         openAtStartup = true,
         position = 30
 )
