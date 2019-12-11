@@ -41,6 +41,7 @@ import org.esa.snap.runtime.Config;
 import org.esa.snap.ui.AbstractDialog;
 import org.esa.snap.ui.GridBagUtils;
 import org.esa.snap.ui.SnapFileChooser;
+import org.esa.snap.ui.PackageDefaults;
 import org.esa.snap.ui.product.BandChooser;
 import org.esa.snap.ui.product.ProductSceneView;
 import org.openide.util.NbBundle;
@@ -80,7 +81,7 @@ import java.util.concurrent.Executors;
 // DEC 2019 Knowles
 
 @NbBundle.Messages({
-        "CTL_ColorManipulationForm_TitlePrefix=Color Manager"
+        "CTL_ColorManipulationForm_TitlePrefix=" + PackageDefaults.COLOR_MANIPULATION_NAME
 })
 class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductSceneView>, ColorManipulationForm {
 

@@ -1,0 +1,901 @@
+diff --git a/snap-product-library-ui/src/main/java/org/esa/snap/productlibrary/rcp/toolviews/ProductLibraryToolView.java b/snap-product-library-ui/src/main/java/org/esa/snap/productlibrary/rcp/toolviews/ProductLibraryToolView.java
+index dd9b953..74a4010 100644
+--- a/snap-product-library-ui/src/main/java/org/esa/snap/productlibrary/rcp/toolviews/ProductLibraryToolView.java
++++ b/snap-product-library-ui/src/main/java/org/esa/snap/productlibrary/rcp/toolviews/ProductLibraryToolView.java
+@@ -64,7 +64,7 @@ import java.io.PrintStream;
+ )
+ @TopComponent.Registration(
+         mode = "rightSlidingSide",
+-        openAtStartup = false,
++        openAtStartup = true,
+         position = 0
+ )
+ @ActionID(category = "Window", id = "org.esa.snap.productlibrary.rcp.toolviews.ProductLibraryToolView")
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationFormImpl.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationFormImpl.java
+index 832621f..d5564aa 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationFormImpl.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationFormImpl.java
+@@ -77,10 +77,9 @@ import java.util.concurrent.Executors;
+ //          - Added color scheme logic which enables setting of the parameters based on the band name or desired color scheme.
+ // DEC 2019 - Knowles / Yang
+ //          - Added capability to export color palette in cpt and pal formats.
+-// DEC 2019 Knowles
+ 
+ @NbBundle.Messages({
+-        "CTL_ColorManipulationForm_TitlePrefix=Color Manager"
++        "CTL_ColorManipulationForm_TitlePrefix=Colour Manipulation"
+ })
+ class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductSceneView>, ColorManipulationForm {
+ 
+@@ -356,36 +355,30 @@ class ColorManipulationFormImpl implements SelectionSupport.Handler<ProductScene
+         gbc.gridwidth = 1;
+         gbc.gridy++;
+         toolButtonsPanel.add(resetButton, gbc);
+-        gbc.gridy++;
+-
+         toolButtonsPanel.add(multiApplyButton, gbc);
+         gbc.gridy++;
+         toolButtonsPanel.add(importButton, gbc);
+-        gbc.gridy++;
+-
+         toolButtonsPanel.add(exportButton, gbc);
+         gbc.gridy++;
+         AbstractButton[] additionalButtons = getChildForm().getToolButtons();
+         for (int i = 0; i < additionalButtons.length; i++) {
+             AbstractButton button = additionalButtons[i];
+             toolButtonsPanel.add(button, gbc);
+-
+-            // Changed to only 1 column
+-//            if (i % 2 == 1) {
++            if (i % 2 == 1) {
+                 gbc.gridy++;
+-//            }
++            }
+         }
+ 
+         gbc.gridy++;
+         gbc.fill = GridBagConstraints.VERTICAL;
+         gbc.weighty = 1.0;
+-        gbc.gridwidth = 1;
++        gbc.gridwidth = 2;
+         toolButtonsPanel.add(new JLabel(" "), gbc); // filler
+         gbc.fill = GridBagConstraints.NONE;
+         gbc.weighty = 0.0;
+         gbc.gridwidth = 1;
+         gbc.gridy++;
+-        gbc.gridx = 0;
++        gbc.gridx = 1;
+         toolButtonsPanel.add(helpButton, gbc);
+     }
+ 
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationTopComponent.java
+index db9bfde..de32ea3 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorManipulationTopComponent.java
+@@ -24,17 +24,15 @@ import org.openide.windows.TopComponent;
+ 
+ import java.awt.BorderLayout;
+ 
+-// DEC 2019 Knowles
+-
+ @TopComponent.Description(
+         preferredID = "ColorManipulationTopComponent",
+         iconBase = "org/esa/snap/rcp/icons/ContrastStretch.gif",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
+ )
+ @TopComponent.Registration(
+-        mode = "properties",
++        mode = "navigator",
+         openAtStartup = true,
+-        position = 10
++        position = 20
+ )
+ @ActionID(category = "Window", id = "org.esa.snap.rcp.colormanip.ColorManipulationTopComponent")
+ @ActionReferences({
+@@ -46,8 +44,8 @@ import java.awt.BorderLayout;
+         preferredID = "ColorManipulationTopComponent"
+ )
+ @NbBundle.Messages({
+-        "CTL_ColorManipulationTopComponent_Name=Color Manager",
+-        "CTL_ColorManipulationTopComponent_ComponentName=Colors"
++        "CTL_ColorManipulationTopComponent_Name=Colour Manipulation",
++        "CTL_ColorManipulationTopComponent_ComponentName=Colour_Manipulation"
+ })
+ /**
+  * The color manipulation tool window.
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorPaletteChooser.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorPaletteChooser.java
+index 1f8328f..0bfc3db 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorPaletteChooser.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/ColorPaletteChooser.java
+@@ -30,12 +30,11 @@ import java.util.Vector;
+ //          - Fixed bug where log scaled color palette would appear crunched in the selector
+ //          - Added tooltips to show which color palette is being hovered over and selected
+ //          - Added blue highlights within the renderer to show which color palette is being hovered over selected
+-// DEC 2019 - Knowles
+ 
+ 
+ class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrapper> {
+ 
+-    private final String DERIVED_FROM = "source: ";
++    private final String DERIVED_FROM = "derived from";
+     private final String UNNAMED = "unnamed";
+     private boolean discreteDisplay;
+     private boolean log10Display;
+@@ -85,11 +84,7 @@ class ColorPaletteChooser extends JComboBox<ColorPaletteChooser.ColorPaletteWrap
+         final String suffix = userPalette.getFirstPoint().getLabel();
+         final String name;
+         if (suffix != null && suffix.trim().length() > 0) {
+-            if (suffix.toLowerCase().endsWith(".cpd")) {
+-                name = DERIVED_FROM + " " + suffix.trim().substring(0, suffix.length() - 4);
+-            } else {
+                 name = DERIVED_FROM + " " + suffix.trim();
+-            }
+         } else {
+             name = UNNAMED;
+         }
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandBasicForm.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandBasicForm.java
+index 1cc32b1..e64a750 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandBasicForm.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandBasicForm.java
+@@ -27,7 +27,6 @@ import org.esa.snap.core.util.PropertyMap;
+ import org.esa.snap.core.util.math.Range;
+ 
+ import javax.swing.*;
+-import javax.swing.border.Border;
+ import javax.swing.event.DocumentEvent;
+ import javax.swing.event.DocumentListener;
+ import javax.swing.text.NumberFormatter;
+@@ -57,7 +56,7 @@ import java.text.DecimalFormat;
+ //          - Added color scheme logic
+ //          - Added capability to reverse the color palette
+ //          - Added capabiltiy to load exact values of the cpd file within any mathematical interpolation applied.
+-// DEC 2019 - Knowles
++
+ 
+ 
+ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+@@ -114,7 +113,6 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         loadWithCPDFileValuesCheckBox.setToolTipText("When loading a new cpd file, use it's actual value and overwrite user min/max values");
+ 
+         paletteInversionButton = new JButton("Reverse");
+-        paletteInversionButton.setMargin(new Insets(2,4,2,4));
+         paletteInversionButton.setToolTipText("Reverse (invert) palette"); /*I18N*/
+         paletteInversionButton.addActionListener(new ActionListener() {
+             @Override
+@@ -129,12 +127,33 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         minField = getNumberTextField(0.00001);
+         maxField = getNumberTextField(1);
+ 
+-        fromFile = new JButton("CPD Values");
+-        fromData = new JButton("Data Values");
+-        fromFile.setMargin(new Insets(2,4,2,4));
+-        fromData.setMargin(new Insets(2,4,2,4));
++        fromFile = new JButton("Cpd Range");
++        fromData = new JButton("Data Range");
++
+ 
+ 
++        final TableLayout layout = new TableLayout();
++        layout.setTableWeightX(1.0);
++        layout.setTableWeightY(1.0);
++        layout.setTablePadding(2, 2);
++        layout.setTableFill(TableLayout.Fill.HORIZONTAL);
++        layout.setTableAnchor(TableLayout.Anchor.NORTH);
++        layout.setCellPadding(0, 0, new Insets(8, 2, 2, 2));
++        layout.setCellPadding(1, 0, new Insets(8, 2, 2, 2));
++        layout.setCellPadding(2, 0, new Insets(8, 2, 2, 2));
++        layout.setCellPadding(3, 0, new Insets(13, 2, 5, 2));
++
++        final JPanel editorPanel = new JPanel(layout);
++
++        JPanel schemePanel = getSchemePanel("Scheme");
++        editorPanel.add(schemePanel);
++
++        JPanel palettePanel = getPalettePanel("Palette");
++        editorPanel.add(palettePanel);
++
++        JPanel rangePanel = getRangePanel("Range");
++        editorPanel.add(rangePanel);
++
+         shouldFireChooserEvent = false;
+ 
+         colorPaletteChooser.addActionListener(createListener(RangeKey.FromPaletteChooser));
+@@ -174,11 +193,11 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+ 
+         fromFile.addActionListener(createListener(RangeKey.FromCpdFile));
+         fromData.addActionListener(createListener(RangeKey.FromData));
+-        fromData.setToolTipText("Set range from data values");
+-        fromFile.setToolTipText("Set range from source cpd file values");
++        fromData.setToolTipText("Set range from data");
++        fromFile.setToolTipText("Set range from cpd file");
+ 
+         contentPanel = new JPanel(new BorderLayout());
+-        contentPanel.add(getMainEditorPanel(), BorderLayout.NORTH);
++        contentPanel.add(editorPanel, BorderLayout.NORTH);
+         moreOptionsForm = new MoreOptionsForm(this, parentForm.getFormModel().canUseHistogramMatching());
+         discreteCheckBox = new DiscreteCheckBox(parentForm);
+         moreOptionsForm.addRow(discreteCheckBox);
+@@ -213,10 +232,6 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         shouldFireChooserEvent = true;
+     }
+ 
+-
+-
+-
+-
+     private void handleMaxTextfield() {
+ 
+         if (!currentMaxFieldValue.equals(maxField.getText().toString())) {
+@@ -294,10 +309,7 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+             currentMaxFieldValue = maxField.getText().toString();
+         }
+ 
+-        System.out.println("shouldFire=" + standardColorPaletteSchemes.isjComboBoxShouldFire());
+-
+         if (standardColorPaletteSchemes.isjComboBoxShouldFire()) {
+-            System.out.println("resetting");
+             standardColorPaletteSchemes.reset();
+         }
+ 
+@@ -330,7 +342,7 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+     @Override
+     public AbstractButton[] getToolButtons() {
+         return new AbstractButton[]{
+-                    logDisplayButton,
++                logDisplayButton,
+         };
+     }
+ 
+@@ -367,86 +379,86 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+             final boolean autoDistribute;
+ 
+             switch (key) {
+-            case FromCpdFile:
+-                Range rangeFromFile = colorPaletteChooser.getRangeFromFile();
+-                isSourceLogScaled = currentInfo.isLogScaled();
+-                isTargetLogScaled = currentInfo.isLogScaled();
+-                min = rangeFromFile.getMin();
+-                max = rangeFromFile.getMax();
+-                cpd = currentCPD;
+-                autoDistribute = true;
+-                break;
+-            case FromData:
+-                final Stx stx = parentForm.getStx(parentForm.getFormModel().getRaster());
+-                isSourceLogScaled = currentInfo.isLogScaled();
+-                isTargetLogScaled = currentInfo.isLogScaled();
+-                min = stx.getMinimum();
+-                max = stx.getMaximum();
+-                cpd = currentCPD;
+-                autoDistribute = true;
+-                break;
+-            case FromMinMaxFields:
+-                isSourceLogScaled = currentInfo.isLogScaled();
+-                isTargetLogScaled = currentInfo.isLogScaled();
+-
+-                if (ColorUtils.checkRangeCompatibility(minField.getText().toString(), maxField.getText().toString())) {
+-                    min = Double.parseDouble(minField.getText().toString());
+-                    max = Double.parseDouble(maxField.getText().toString());
+-                } else {
+-                    checksOut = false;
+-                    min = 0; //bogus unused values set just so it is initialized to make idea happy
+-                    max = 0; //bogus unused values set just so it is initialized to make idea happy
+-                }
+-
+-                cpd = currentCPD;
+-                autoDistribute = true;
+-                break;
+-            case FromLogButton:
+-                isSourceLogScaled = currentInfo.isLogScaled();
+-                isTargetLogScaled = !currentInfo.isLogScaled();
+-                min = currentCPD.getMinDisplaySample();
+-                max = currentCPD.getMaxDisplaySample();
+-                cpd = currentCPD;
+-
+-                autoDistribute = true;
+-                break;
+-                case InvertPalette:
++                case FromCpdFile:
++                    Range rangeFromFile = colorPaletteChooser.getRangeFromFile();
+                     isSourceLogScaled = currentInfo.isLogScaled();
+                     isTargetLogScaled = currentInfo.isLogScaled();
+-                    min = currentCPD.getMinDisplaySample();
+-                    max = currentCPD.getMaxDisplaySample();
++                    min = rangeFromFile.getMin();
++                    max = rangeFromFile.getMax();
+                     cpd = currentCPD;
+-
+                     autoDistribute = true;
+                     break;
+-            default:
+-                if (loadWithCPDFileValuesCheckBox.isSelected()) {
+-                    isSourceLogScaled = selectedCPD.isLogScaled();
+-                    isTargetLogScaled = selectedCPD.isLogScaled();
+-                    autoDistribute = false;
+-                    currentInfo.setLogScaled(isTargetLogScaled);
+-                    rangeFromFile = colorPaletteChooser.getRangeFromFile();
++                case FromData:
++                    final Stx stx = parentForm.getStx(parentForm.getFormModel().getRaster());
++                    isSourceLogScaled = currentInfo.isLogScaled();
++                    isTargetLogScaled = currentInfo.isLogScaled();
++                    min = stx.getMinimum();
++                    max = stx.getMaximum();
++                    cpd = currentCPD;
++                    autoDistribute = true;
++                    break;
++                case FromMinMaxFields:
++                    isSourceLogScaled = currentInfo.isLogScaled();
++                    isTargetLogScaled = currentInfo.isLogScaled();
+ 
+-                    min = rangeFromFile.getMin();
+-                    max = rangeFromFile.getMax();
+-                    cpd = deepCopy;
+-                    deepCopy.setLogScaled(isTargetLogScaled);
+-                    deepCopy.setAutoDistribute(autoDistribute);
++                    if (ColorUtils.checkRangeCompatibility(minField.getText().toString(), maxField.getText().toString())) {
++                        min = Double.parseDouble(minField.getText().toString());
++                        max = Double.parseDouble(maxField.getText().toString());
++                    } else {
++                        checksOut = false;
++                        min = 0; //bogus unused values set just so it is initialized to make idea happy
++                        max = 0; //bogus unused values set just so it is initialized to make idea happy
++                    }
+ 
++                    cpd = currentCPD;
++                    autoDistribute = true;
++                    break;
++                case FromLogButton:
++                    isSourceLogScaled = currentInfo.isLogScaled();
++                    isTargetLogScaled = !currentInfo.isLogScaled();
++                    min = currentCPD.getMinDisplaySample();
++                    max = currentCPD.getMaxDisplaySample();
++                    cpd = currentCPD;
+ 
+-                    if (ColorUtils.checkRangeCompatibility(min, max, isTargetLogScaled)) {
+-                        listenToLogDisplayButtonEnabled[0] = false;
+-                        logDisplayButton.setSelected(isTargetLogScaled);
+-                        listenToLogDisplayButtonEnabled[0] = true;
+-                    }
+-                } else {
+-                    isSourceLogScaled = selectedCPD.isLogScaled();
++                    autoDistribute = true;
++                    break;
++                case InvertPalette:
++                    isSourceLogScaled = currentInfo.isLogScaled();
+                     isTargetLogScaled = currentInfo.isLogScaled();
+                     min = currentCPD.getMinDisplaySample();
+                     max = currentCPD.getMaxDisplaySample();
+-                    cpd = deepCopy;
++                    cpd = currentCPD;
++
+                     autoDistribute = true;
+-                }
++                    break;
++                default:
++                    if (loadWithCPDFileValuesCheckBox.isSelected()) {
++                        isSourceLogScaled = selectedCPD.isLogScaled();
++                        isTargetLogScaled = selectedCPD.isLogScaled();
++                        autoDistribute = false;
++                        currentInfo.setLogScaled(isTargetLogScaled);
++                        rangeFromFile = colorPaletteChooser.getRangeFromFile();
++
++                        min = rangeFromFile.getMin();
++                        max = rangeFromFile.getMax();
++                        cpd = deepCopy;
++                        deepCopy.setLogScaled(isTargetLogScaled);
++                        deepCopy.setAutoDistribute(autoDistribute);
++
++
++                        if (ColorUtils.checkRangeCompatibility(min, max, isTargetLogScaled)) {
++                            listenToLogDisplayButtonEnabled[0] = false;
++                            logDisplayButton.setSelected(isTargetLogScaled);
++                            listenToLogDisplayButtonEnabled[0] = true;
++                        }
++                    } else {
++                        isSourceLogScaled = selectedCPD.isLogScaled();
++                        isTargetLogScaled = currentInfo.isLogScaled();
++                        min = currentCPD.getMinDisplaySample();
++                        max = currentCPD.getMaxDisplaySample();
++                        cpd = deepCopy;
++                        autoDistribute = true;
++                    }
+ 
+             }
+ 
+@@ -472,37 +484,6 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         }
+     }
+ 
+-
+-
+-    private JPanel getMainEditorPanel() {
+-        final TableLayout layout = new TableLayout();
+-        layout.setTableWeightX(1.0);
+-        layout.setTableWeightY(1.0);
+-        layout.setTablePadding(2, 2);
+-        layout.setTableFill(TableLayout.Fill.HORIZONTAL);
+-        layout.setTableAnchor(TableLayout.Anchor.NORTH);
+-        layout.setCellPadding(0, 0, new Insets(8, 2, 2, 2));
+-        layout.setCellPadding(1, 0, new Insets(8, 2, 2, 2));
+-        layout.setCellPadding(2, 0, new Insets(8, 2, 2, 2));
+-        layout.setCellPadding(3, 0, new Insets(13, 2, 5, 2));
+-
+-        final JPanel editorPanel = new JPanel(layout);
+-
+-
+-        JPanel palettePanel = getPalettePanel("Palette");
+-        editorPanel.add(palettePanel);
+-
+-        JPanel rangePanel = getRangePanel("Range");
+-        editorPanel.add(rangePanel);
+-
+-
+-        JPanel schemePanel = getSchemePanel("Scheme");
+-        editorPanel.add(schemePanel);
+-
+-        return editorPanel;
+-    }
+-
+-
+     private JPanel getSchemePanel(String title) {
+         JPanel jPanel = new JPanel(new GridBagLayout());
+         jPanel.setBorder(BorderFactory.createTitledBorder(title));
+@@ -533,6 +514,7 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         jPanel.setToolTipText("");
+         GridBagConstraints gbc = new GridBagConstraints();
+ 
++
+         gbc.weightx = 1.0;
+         gbc.insets = new Insets(0, 4, 4, 4);
+ 
+@@ -543,60 +525,41 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         jPanel.add(colorPaletteChooser, gbc);
+ 
+         gbc.gridy++;
+-        jPanel.add(loadWithCPDFileValuesCheckBox, gbc);
++        gbc.fill = GridBagConstraints.HORIZONTAL;
+ 
+-        gbc.fill = GridBagConstraints.NONE;
+-        gbc.gridy++;
+-        jPanel.add(paletteInversionButton, gbc);
++        final JPanel row2Panel = new JPanel(new BorderLayout(0, 0));
++        row2Panel.add(loadWithCPDFileValuesCheckBox, BorderLayout.WEST);
++        row2Panel.add(paletteInversionButton, BorderLayout.EAST);
+ 
+-        return jPanel;
+-    }
++        jPanel.add(row2Panel, gbc);
+ 
+ 
++        return jPanel;
++    }
+ 
+ 
+ 
++    private JPanel getRangePanel(String title) {
+ 
+-    private JPanel getMinMaxPanel() {
+         JPanel jPanel = new JPanel(new GridBagLayout());
++        jPanel.setBorder(BorderFactory.createTitledBorder(title));
++        jPanel.setToolTipText("");
+         GridBagConstraints gbc = new GridBagConstraints();
+ 
+-        gbc.insets = new Insets(0, 0, 5, 0);
+-        gbc.anchor = GridBagConstraints.WEST;
+-
+-        gbc.gridx = 0;
+-        gbc.gridy = 0;
+-        gbc.weightx = 0.0;
+-        gbc.fill = GridBagConstraints.NONE;
+-        jPanel.add(new JLabel("Min:"), gbc);
+-
+-        gbc.weightx = 1.0;
+-        gbc.gridx = 1;
+-        gbc.fill = GridBagConstraints.HORIZONTAL;
+-        jPanel.add(minField, gbc);
+-
+-        gbc.insets = new Insets(0, 0, 0, 0);
+-        gbc.gridx = 0;
+-        gbc.gridy = 1;
+-        gbc.weightx = 0.0;
+-        gbc.fill = GridBagConstraints.NONE;
+-        jPanel.add(new JLabel("Max:"), gbc);
+ 
+-        gbc.gridx = 1;
+-        gbc.weightx = 1.0;
+-        gbc.fill = GridBagConstraints.HORIZONTAL;
+-        jPanel.add(maxField, gbc);
+ 
+-        return jPanel;
+-    }
++        final JPanel minPanel = new JPanel(new BorderLayout(0, 0));
++        minPanel.add(new JLabel("Min:"), BorderLayout.WEST);
++        minPanel.add(minField, BorderLayout.EAST);
+ 
++        final JPanel maxPanel = new JPanel(new BorderLayout(0, 0));
++        maxPanel.add(new JLabel("Max:"), BorderLayout.WEST);
++        maxPanel.add(maxField, BorderLayout.EAST);
+ 
+-    private JPanel getRangePanel(String title) {
++        final JPanel minMaxPanel = new JPanel(new BorderLayout(0, 0));
++        minMaxPanel.add(minPanel, BorderLayout.WEST);
++        minMaxPanel.add(maxPanel, BorderLayout.EAST);
+ 
+-        JPanel jPanel = new JPanel(new GridBagLayout());
+-        jPanel.setBorder(BorderFactory.createTitledBorder(title));
+-        jPanel.setToolTipText("");
+-        GridBagConstraints gbc = new GridBagConstraints();
+ 
+         gbc.weightx = 1.0;
+         gbc.insets = new Insets(0, 5, 5, 5);
+@@ -605,21 +568,25 @@ public class Continuous1BandBasicForm implements ColorManipulationChildForm {
+         gbc.gridy = 0;
+         gbc.anchor = GridBagConstraints.WEST;
+         gbc.fill = GridBagConstraints.HORIZONTAL;
++        jPanel.add(minMaxPanel, gbc);
+ 
+-        jPanel.add(getMinMaxPanel(), gbc);
+ 
+-        gbc.fill = GridBagConstraints.NONE;
+-        gbc.gridy++;
+-        jPanel.add(fromFile, gbc);
++        final JPanel buttonPanel = new JPanel(new BorderLayout(5, 10));
++        buttonPanel.add(fromFile, BorderLayout.WEST);
++        buttonPanel.add(fromData, BorderLayout.EAST);
++
+ 
+         gbc.gridy++;
+-        jPanel.add(fromData, gbc);
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        gbc.insets = new Insets(0, 4, 4, 4);
++
++
++        jPanel.add(buttonPanel, gbc);
+ 
+         return jPanel;
+     }
+ 
+ 
+-
+     private void handleColorPaletteInfoComboBoxSelection(JComboBox jComboBox, boolean isDefaultList) {
+         ColorPaletteInfo colorPaletteInfo = (ColorPaletteInfo) jComboBox.getSelectedItem();
+ 
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandSwitcherForm.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandSwitcherForm.java
+index 7ea42af..fc496e6 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandSwitcherForm.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandSwitcherForm.java
+@@ -37,7 +37,6 @@ import java.awt.event.ActionListener;
+  */
+ // OCT 2019 - Knowles
+ //          - Set basic mode to be the default
+-// DEC 2019 - Knowles
+ 
+ 
+ public class Continuous1BandSwitcherForm implements ColorManipulationChildForm {
+@@ -70,7 +69,7 @@ public class Continuous1BandSwitcherForm implements ColorManipulationChildForm {
+         tabularButton.addActionListener(switcherActionListener);
+ 
+         final JPanel editorSwitcherPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+-//        editorSwitcherPanel.add(new JLabel("Editor:"));
++        editorSwitcherPanel.add(new JLabel("Editor:"));
+         editorSwitcherPanel.add(basicButton);
+         editorSwitcherPanel.add(graphicalButton);
+         editorSwitcherPanel.add(tabularButton);
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandTabularForm.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandTabularForm.java
+index f57e579..395fb7d 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandTabularForm.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/Continuous1BandTabularForm.java
+@@ -47,7 +47,7 @@ import java.awt.Component;
+ 
+ public class Continuous1BandTabularForm implements ColorManipulationChildForm {
+ 
+-    private static final String[] COLUMN_NAMES = new String[]{"Color", "Value"};
++    private static final String[] COLUMN_NAMES = new String[]{"Colour", "Value"};
+     private static final Class<?>[] COLUMN_TYPES = new Class<?>[]{Color.class, String.class};
+ 
+     private final ColorManipulationForm parentForm;
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/UncertaintyVisualisationTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/UncertaintyVisualisationTopComponent.java
+index 6ee7f5c..02b9eaa 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/UncertaintyVisualisationTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/colormanip/UncertaintyVisualisationTopComponent.java
+@@ -45,7 +45,7 @@ import java.awt.Component;
+ )
+ @TopComponent.Registration(
+         mode = "navigator",
+-        openAtStartup = false,
++        openAtStartup = true,
+         position = 30
+ )
+ @ActionID(category = "Window", id = "org.esa.snap.rcp.colormanip.UncertaintyVisualisationTopComponent")
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/layermanager/LayerManagerTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/layermanager/LayerManagerTopComponent.java
+index 22edfeb..7471ea9 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/layermanager/LayerManagerTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/layermanager/LayerManagerTopComponent.java
+@@ -29,17 +29,15 @@ import org.openide.windows.TopComponent;
+ import java.awt.BorderLayout;
+ import java.util.WeakHashMap;
+ 
+-// DEC 2019 Knowles
+-
+ @TopComponent.Description(
+         preferredID = "LayerManagerTopComponent",
+         iconBase = "org/esa/snap/rcp/icons/LayerManager.png",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS //todo define
+ )
+ @TopComponent.Registration(
+-        mode = "properties",
++        mode = "rightSlidingSide",
+         openAtStartup = true,
+-        position = 30
++        position = 10
+ )
+ @ActionID(category = "Window", id = "org.esa.snap.rcp.layermanager.LayerManagerTopComponent")
+ @ActionReferences({
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskFormActions.java b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskFormActions.java
+index 43e3d25..24e97ec 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskFormActions.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskFormActions.java
+@@ -96,21 +96,15 @@ class MaskFormActions {
+ 
+     MaskFormActions(ToolTopComponent maskTopComponent, MaskForm maskForm) {
+         maskActions = new MaskAction[]{
+-                new NewBandMathsAction(maskForm),
+-                new NewRangeAction(maskForm),
+-                new NewVectorDataNodeAction(maskForm),
+-                new NewUnionAction(maskForm),
+-                new NewIntersectionAction(maskForm),
+-                new NewDifferenceAction(maskForm),
+-                new NewInvDifferenceAction(maskForm),
+-                new NewComplementAction(maskForm),
+-                new CopyAction(maskForm),
+-                new EditAction(maskForm),
+-                new RemoveAction(maskForm),
+-                new TransferAction(maskForm),
+-                new ImportAction(maskTopComponent, maskForm),
+-                new ExportAction(maskTopComponent, maskForm),
+-                new ZoomToVectorMaskAction(maskTopComponent, maskForm)
++                new NewBandMathsAction(maskForm), new NewRangeAction(maskForm),
++                new NewVectorDataNodeAction(maskForm), new NullAction(maskForm),
++                new NewUnionAction(maskForm), new NewIntersectionAction(maskForm),
++                new NewDifferenceAction(maskForm), new NewInvDifferenceAction(maskForm),
++                new NewComplementAction(maskForm), new NullAction(maskForm),
++                new CopyAction(maskForm), new EditAction(maskForm),
++                new RemoveAction(maskForm), new TransferAction(maskForm),
++                new ImportAction(maskTopComponent, maskForm), new ExportAction(maskTopComponent, maskForm),
++                new ZoomToVectorMaskAction(maskTopComponent, maskForm), new NullAction(maskForm),
+         };
+     }
+ 
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerForm.java b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerForm.java
+index 3c0ac95..ba39e28 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerForm.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerForm.java
+@@ -62,7 +62,6 @@ class MaskManagerForm extends MaskForm {
+         }
+     }
+ 
+-
+     @Override
+     public JPanel createContentPanel() {
+         JPanel buttonPanel = GridBagUtils.createPanel();
+@@ -75,17 +74,19 @@ class MaskManagerForm extends MaskForm {
+         gbc.insets.bottom = 0;
+         gbc.gridwidth = 1;
+         final MaskAction[] allActions = actions.getAllActions();
+-        for (int i = 0; i < allActions.length; i += 1) {
++        for (int i = 0; i < allActions.length; i += 2) {
+             buttonPanel.add(allActions[i].createComponent(), gbc);
++            buttonPanel.add(allActions[i + 1].createComponent(), gbc);
+             gbc.gridy++;
+         }
+ 
+         gbc.fill = GridBagConstraints.VERTICAL;
+         gbc.weighty = 1.0;
++        gbc.gridwidth = 2;
+         buttonPanel.add(new JLabel(" "), gbc); // filler
+         gbc.fill = GridBagConstraints.NONE;
+         gbc.weighty = 0.0;
+-        gbc.gridx = 0;
++        gbc.gridx = 1;
+         gbc.gridy++;
+         gbc.gridwidth = 1;
+         buttonPanel.add(helpButton, gbc);
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerToolTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerToolTopComponent.java
+index 5c63f96..7065794 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerToolTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskManagerToolTopComponent.java
+@@ -25,15 +25,13 @@ import org.openide.windows.TopComponent;
+ 
+ import javax.swing.event.ListSelectionListener;
+ 
+-// DEC 2019 Knowles
+-
+ @TopComponent.Description(
+         preferredID = "MaskManagerTopComponent",
+         iconBase = "org/esa/snap/rcp/icons/MaskManager.png",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS //todo define
+ )
+ @TopComponent.Registration(
+-        mode = "properties",
++        mode = "rightSlidingSide",
+         openAtStartup = true,
+         position = 20
+ )
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskTableModel.java b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskTableModel.java
+index 2497473..54b7e08 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskTableModel.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/mask/MaskTableModel.java
+@@ -31,21 +31,20 @@ class MaskTableModel extends AbstractTableModel {
+ 
+     private static final int IDX_VISIBILITY = 0;
+     private static final int IDX_NAME = 1;
+-    private static final int IDX_COLOR = 2;
+-    private static final int IDX_TRANSPARENCY = 3;
+-    private static final int IDX_DESCRIPTION = 4;
+-    private static final int IDX_TYPE = 5;
+-
++    private static final int IDX_TYPE = 2;
++    private static final int IDX_COLOR = 3;
++    private static final int IDX_TRANSPARENCY = 4;
++    private static final int IDX_DESCRIPTION = 5;
+ 
+     /**
+      * Mask management mode, no visibility control.
+      */
+     private static final int[] IDXS_MODE_MANAG_NO_BAND = {
+             IDX_NAME,
++            IDX_TYPE,
+             IDX_COLOR,
+             IDX_TRANSPARENCY,
+             IDX_DESCRIPTION,
+-            IDX_TYPE,
+     };
+ 
+     /**
+@@ -54,10 +53,10 @@ class MaskTableModel extends AbstractTableModel {
+     private static final int[] IDXS_MODE_MANAG_BAND = {
+             IDX_VISIBILITY,
+             IDX_NAME,
++            IDX_TYPE,
+             IDX_COLOR,
+             IDX_TRANSPARENCY,
+             IDX_DESCRIPTION,
+-            IDX_TYPE,
+     };
+ 
+     /**
+@@ -84,37 +83,37 @@ class MaskTableModel extends AbstractTableModel {
+     private static final Class[] COLUMN_CLASSES = {
+             Boolean.class,
+             String.class,
++            String.class,
+             Color.class,
+             Double.class,
+             String.class,
+-            String.class,
+     };
+ 
+     private static final String[] COLUMN_NAMES = {
+             "Visibility",
+             "Name",
+-            "Color",
++            "Type",
++            "Colour",
+             "Transparency",
+             "Description",
+-            "Type",
+     };
+ 
+     private static final boolean[] COLUMN_EDITABLE_STATES = {
+             true,
+             true,
++            false,
+             true,
+             true,
+             true,
+-            false,
+     };
+ 
+     static int[] INITIAL_COLUMN_WIDTHS = {
+             24,
+             60,
+             60,
++            60,
+             40,
+             320,
+-            60,
+     };
+ 
+     private final MaskPNL maskPNL;
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/windows/PixelInfoTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/windows/PixelInfoTopComponent.java
+index 303884c..d3dc144 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/windows/PixelInfoTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/windows/PixelInfoTopComponent.java
+@@ -35,9 +35,6 @@ import java.beans.PropertyChangeListener;
+ /**
+  * Experimental top component which displays information about selected pixel.
+  */
+-
+-// DEC 2019 Knowles
+-
+ @TopComponent.Description(
+         preferredID = "PixelInfoTopComponent",
+         iconBase = "org/esa/snap/rcp/icons/PixelInfo.png",
+@@ -71,7 +68,7 @@ public final class PixelInfoTopComponent extends ToolTopComponent {
+         setName(Bundle.CTL_PixelInfoTopComponentName());
+         setToolTipText(Bundle.CTL_PixelInfoTopComponentDescription());
+         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
+-//        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
++        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
+         pixelPositionListener = new MyPixelPositionListener();
+         pinSelectionChangeListener = new PinSelectionChangeListener();
+         pinChangedListener = new PinChangedListener();
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/windows/ProductExplorerTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/windows/ProductExplorerTopComponent.java
+index d32830f..1023ef6 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/windows/ProductExplorerTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/windows/ProductExplorerTopComponent.java
+@@ -47,8 +47,6 @@ import java.util.logging.Level;
+  *
+  * @author Norman
+  */
+-// DEC 2019 Knowles
+-
+ @TopComponent.Description(
+         preferredID = "ProductExplorerTopComponent",
+         iconBase = "org/esa/snap/rcp/icons/RsProduct16.gif",
+@@ -65,7 +63,7 @@ import java.util.logging.Level;
+         preferredID = "ProductExplorerTopComponent"
+ )
+ @NbBundle.Messages({
+-        "CTL_ProductExplorerTopComponentName=File Manager",
++        "CTL_ProductExplorerTopComponentName=Product Explorer",
+         "CTL_ProductExplorerTopComponentDescription=Lists all open products",
+ })
+ public class ProductExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
+@@ -75,7 +73,7 @@ public class ProductExplorerTopComponent extends TopComponent implements Explore
+ 
+     public ProductExplorerTopComponent() {
+         initComponents();
+-        setName("File Manager");
++        setName("Product_Explorer");
+         setDisplayName(Bundle.CTL_ProductExplorerTopComponentName());
+         setToolTipText(Bundle.CTL_ProductExplorerTopComponentDescription());
+         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
+diff --git a/snap-rcp/src/main/java/org/esa/snap/rcp/worldmap/WorldMapTopComponent.java b/snap-rcp/src/main/java/org/esa/snap/rcp/worldmap/WorldMapTopComponent.java
+index 3e78fd4..599962b 100644
+--- a/snap-rcp/src/main/java/org/esa/snap/rcp/worldmap/WorldMapTopComponent.java
++++ b/snap-rcp/src/main/java/org/esa/snap/rcp/worldmap/WorldMapTopComponent.java
+@@ -45,7 +45,7 @@ import static org.esa.snap.rcp.SnapApp.SelectionSourceHint.*;
+ )
+ @TopComponent.Registration(
+         mode = "navigator",
+-        openAtStartup = true,
++        openAtStartup = false,
+         position = 40
+ )
+ @ActionID(category = "Window", id = "org.esa.snap.rcp.worldmap.WorldMapTopComponent")
+diff --git a/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneImage.java b/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneImage.java
+index 09a2798..6440360 100644
+--- a/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneImage.java
++++ b/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneImage.java
+@@ -304,7 +304,7 @@ public class ProductSceneImage implements ProductLayerContext {
+         final LayerType noDataType = LayerTypeRegistry.getLayerType(NoDataLayerType.class);
+         final PropertySet configTemplate = noDataType.createLayerConfig(null);
+ 
+-        final Color color = configuration.getPropertyColor("noDataOverlay.color", Color.GRAY);
++        final Color color = configuration.getPropertyColor("noDataOverlay.color", Color.ORANGE);
+         configTemplate.setValue(NoDataLayerType.PROPERTY_NAME_COLOR, color);
+         configTemplate.setValue(NoDataLayerType.PROPERTY_NAME_RASTER, getRaster());
+         final Layer layer = noDataType.createLayer(this, configTemplate);
+diff --git a/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneView.java b/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneView.java
+index 0dc810b..f1b7b8e 100644
+--- a/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneView.java
++++ b/snap-ui/src/main/java/org/esa/snap/ui/product/ProductSceneView.java
+@@ -163,7 +163,7 @@ public class ProductSceneView extends BasicView
+      * Name of property of selected pin
+      */
+     public static final String PROPERTY_NAME_SELECTED_PIN = "selectedPin";
+-    public static final Color DEFAULT_IMAGE_BACKGROUND_COLOR = new Color(255, 255, 255);
++    public static final Color DEFAULT_IMAGE_BACKGROUND_COLOR = new Color(51, 51, 51);
+ 
+ 
+     private ProductSceneImage sceneImage;

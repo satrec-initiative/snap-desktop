@@ -15,6 +15,7 @@
  */
 package org.esa.snap.rcp.colormanip;
 
+import org.esa.snap.ui.PackageDefaults;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -46,8 +47,8 @@ import java.awt.BorderLayout;
         preferredID = "ColorManipulationTopComponent"
 )
 @NbBundle.Messages({
-        "CTL_ColorManipulationTopComponent_Name=Color Manager",
-        "CTL_ColorManipulationTopComponent_ComponentName=Colors"
+        "CTL_ColorManipulationTopComponent_Name=" + PackageDefaults.COLOR_MANIPULATION_NAME,
+        "CTL_ColorManipulationTopComponent_ComponentName=" + PackageDefaults.COLOR_MANIPULATION_NAME
 })
 /**
  * The color manipulation tool window.
