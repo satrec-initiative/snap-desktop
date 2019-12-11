@@ -33,9 +33,9 @@ import java.awt.BorderLayout;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(
-        mode = "properties",
+        mode = PackageDefaults.COLOR_MANIPULATION_MODE,
         openAtStartup = true,
-        position = 10
+        position = PackageDefaults.COLOR_MANIPULATION_POSITION
 )
 @ActionID(category = "Window", id = "org.esa.snap.rcp.colormanip.ColorManipulationTopComponent")
 @ActionReferences({

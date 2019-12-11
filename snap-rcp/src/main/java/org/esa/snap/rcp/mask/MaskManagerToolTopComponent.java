@@ -16,6 +16,7 @@
 package org.esa.snap.rcp.mask;
 
 import org.esa.snap.rcp.windows.ToolTopComponent;
+import org.esa.snap.ui.PackageDefaults;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -33,9 +34,9 @@ import javax.swing.event.ListSelectionListener;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS //todo define
 )
 @TopComponent.Registration(
-        mode = "properties",
-        openAtStartup = true,
-        position = 20
+        mode = PackageDefaults.MASK_MANAGER_MODE,
+        openAtStartup = PackageDefaults.MASK_MANAGER_OPEN,
+        position = PackageDefaults.MASK_MANAGER_POSITION
 )
 @ActionID(category = "Window", id = "org.esa.snap.rcp.mask.MaskManagerTopComponent")
 @ActionReferences({
@@ -47,7 +48,7 @@ import javax.swing.event.ListSelectionListener;
         preferredID = "MaskManagerTopComponent"
 )
 @NbBundle.Messages({
-        "CTL_MaskManagerTopComponent_Name=Mask Manager",
+        "CTL_MaskManagerTopComponent_Name=" + PackageDefaults.MASK_MANAGER_NAME,
         "CTL_MaskManagerTopComponent_HelpId=showMaskManagerWnd"
 })
 public class MaskManagerToolTopComponent extends MaskToolTopComponent {

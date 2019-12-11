@@ -56,9 +56,9 @@ import java.util.logging.Level;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(
-        mode = "explorer",
-        openAtStartup = true,
-        position = 10)
+        mode = PackageDefaults.PRODUCT_EXPLORER_MODE,
+        openAtStartup =  PackageDefaults.PRODUCT_EXPLORER_OPEN,
+        position = PackageDefaults.PRODUCT_EXPLORER_POSITION)
 @ActionID(category = "Window", id = "org.esa.snap.rcp.window.ProductExplorerTopComponent")
 @ActionReference(path = "Menu/View/Tool Windows", position = 0)
 @TopComponent.OpenActionRegistration(
@@ -76,7 +76,7 @@ public class ProductExplorerTopComponent extends TopComponent implements Explore
 
     public ProductExplorerTopComponent() {
         initComponents();
-        setName("File Manager");
+        setName(PackageDefaults.PRODUCT_EXPLORER_NAME);
         setDisplayName(Bundle.CTL_ProductExplorerTopComponentName());
         setToolTipText(Bundle.CTL_ProductExplorerTopComponentDescription());
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
