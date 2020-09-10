@@ -232,7 +232,7 @@ public class DefaultProductLayer extends BaseLayer implements WWLayer {
         float centreLon = 0;
 
         for (GeneralPath boundaryPath : boundaryPaths) {
-            if(i == 0) {
+            if (i == 0) {
                 final PathIterator it = boundaryPath.getPathIterator(null);
                 final float[] floats = new float[2];
                 final List<Position> positions = new ArrayList<>(4);
