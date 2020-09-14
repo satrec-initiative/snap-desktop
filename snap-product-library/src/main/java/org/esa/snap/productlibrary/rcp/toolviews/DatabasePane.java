@@ -48,7 +48,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
-    UI for database query
+ UI for database query
  */
 public final class DatabasePane extends JPanel {
 
@@ -123,14 +123,14 @@ public final class DatabasePane extends JPanel {
 
             bboxInsideButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
+//                    dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
                     partialQuery();
                 }
             });
 
             bboxIntersectButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
+//                    dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
                     partialQuery();
                 }
             });
@@ -507,7 +507,7 @@ public final class DatabasePane extends JPanel {
     void setSelectionRect(final GeoPos[] selectionBox) {
         dbQuery.setSelectionRect(selectionBox);
         dbQuery.setReturnAllIfNoIntersection(true);
-        dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
+//        dbQuery.insideSelectionRectangle(bboxInsideButton.isSelected());
         partialQuery();
     }
 

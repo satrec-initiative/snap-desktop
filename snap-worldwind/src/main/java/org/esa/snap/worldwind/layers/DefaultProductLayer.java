@@ -55,6 +55,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -177,19 +178,19 @@ public class DefaultProductLayer extends BaseLayer implements WWLayer {
                     final Product newProduct = createSubsampledProduct(product);
                     final Band band = newProduct.getBandAt(0);
                     final BufferedImage image = ProductUtils.createRgbImage(new RasterDataNode[]{band},
-                                                                            band.getImageInfo(com.bc.ceres.core.ProgressMonitor.NULL),
-                                                                            com.bc.ceres.core.ProgressMonitor.NULL);
+                            band.getImageInfo(com.bc.ceres.core.ProgressMonitor.NULL),
+                            com.bc.ceres.core.ProgressMonitor.NULL);
 
                     final GeoPos geoPos1 = product.getSceneGeoCoding().getGeoPos(new PixelPos(0, 0), null);
                     final GeoPos geoPos2 = product.getSceneGeoCoding().getGeoPos(new PixelPos(product.getSceneRasterWidth() - 1,
-                                                                                         product.getSceneRasterHeight() - 1),
-                                                                            null
+                                    product.getSceneRasterHeight() - 1),
+                            null
                     );
 
                     final Sector sector = new Sector(Angle.fromDegreesLatitude(geoPos1.getLat()),
-                                                     Angle.fromDegreesLatitude(geoPos2.getLat()),
-                                                     Angle.fromDegreesLongitude(geoPos1.getLon()),
-                                                     Angle.fromDegreesLongitude(geoPos2.getLon()));
+                            Angle.fromDegreesLatitude(geoPos2.getLat()),
+                            Angle.fromDegreesLongitude(geoPos1.getLon()),
+                            Angle.fromDegreesLongitude(geoPos2.getLon()));
 
                     final SurfaceImage si = new SurfaceImage(image, sector);
                     si.setOpacity(getOpacity());
@@ -224,54 +225,52 @@ public class DefaultProductLayer extends BaseLayer implements WWLayer {
         final int step = Math.max(16, (product.getSceneRasterWidth() + product.getSceneRasterHeight()) / 250);
         final GeneralPath[] boundaryPaths = ProductUtils.createGeoBoundaryPaths(product, null, step);
 
-        final Polyline[] polyLineList = new Polyline[boundaryPaths.length];
+        final Polyline[] polyLineList = new Polyline[1];
         int i = 0;
         int numPoints = 0;
         float centreLat = 0;
         float centreLon = 0;
 
         for (GeneralPath boundaryPath : boundaryPaths) {
-            final PathIterator it = boundaryPath.getPathIterator(null);
-            final float[] floats = new float[2];
-            final List<Position> positions = new ArrayList<>(4);
+            if (i == 0) {
+                final PathIterator it = boundaryPath.getPathIterator(null);
+                final float[] floats = new float[2];
+                final List<Position> positions = new ArrayList<>(4);
 
-            it.currentSegment(floats);
-            final Position firstPosition = new Position(Angle.fromDegreesLatitude(floats[1]),
-                                                        Angle.fromDegreesLongitude(floats[0]), 0.0);
-            positions.add(firstPosition);
-            centreLat += floats[1];
-            centreLon += floats[0];
-            it.next();
-            numPoints++;
-
-            while (!it.isDone()) {
                 it.currentSegment(floats);
-                positions.add(new Position(Angle.fromDegreesLatitude(floats[1]),
-                                           Angle.fromDegreesLongitude(floats[0]), 0.0));
-
+                final Position firstPosition = new Position(Angle.fromDegreesLatitude(floats[1]),
+                        Angle.fromDegreesLongitude(floats[0]), 0.0);
+                positions.add(firstPosition);
                 centreLat += floats[1];
                 centreLon += floats[0];
                 it.next();
                 numPoints++;
+
+                while (!it.isDone()) {
+                    it.currentSegment(floats);
+                    positions.add(new Position(Angle.fromDegreesLatitude(floats[1]),
+                            Angle.fromDegreesLongitude(floats[0]), 0.0));
+                    centreLat += floats[1];
+                    centreLon += floats[0];
+                    it.next();
+                    numPoints++;
+                }
+                // close the loop
+                positions.add(firstPosition);
+
+                centreLat = centreLat / numPoints;
+                centreLon = centreLon / numPoints;
+
+                polyLineList[i] = new Polyline();
+                polyLineList[i].setFollowTerrain(true);
+                polyLineList[i].setPositions(positions);
+
+                addRenderable(polyLineList[i]);
             }
-            // close the loop
-            positions.add(firstPosition);
-
-            centreLat = centreLat / numPoints;
-            centreLon = centreLon / numPoints;
-
-
-            polyLineList[i] = new Polyline();
-            polyLineList[i].setFollowTerrain(true);
-            polyLineList[i].setPositions(positions);
-
-            // ADDED
-            //polyLineList[i].setColor(new Color(1f, 0f, 0f, 0.99f));
-            //polyLineList[i].setLineWidth(10);
-
-            addRenderable(polyLineList[i]);
             ++i;
         }
+
+        // need to fix Positions here!
 
         Position centrePos = new Position(Angle.fromDegreesLatitude(centreLat), Angle.fromDegreesLongitude(centreLon), 0.0);
 
